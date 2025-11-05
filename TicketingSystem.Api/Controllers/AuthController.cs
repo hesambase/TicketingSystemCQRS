@@ -10,24 +10,24 @@ namespace TicketingSystem.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly SimpleMediator _mediator;
+        private readonly ICommandBus _bus;
 
-        public AuthController(SimpleMediator mediator)
+        public AuthController(ICommandBus bus)
         {
-            _mediator = mediator;
+            _bus = bus;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
-            var token = await _mediator.Send(command);
+            var token = await _bus.Send(command);
             return Ok(new { token });
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterCommand command)
         {
-            var userId = await _mediator.Send(command);
+            var userId = await _bus.Send(command);
             return Ok(new { userId });
         }
 

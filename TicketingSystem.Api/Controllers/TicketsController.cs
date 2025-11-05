@@ -15,39 +15,39 @@ namespace TicketingSystem.Api.Controllers
     [Route("tickets")]
     public class TicketController : ControllerBase
     {
-        private readonly SimpleMediator _mediator;
+        private readonly ICommandBus _bus;
 
-        public TicketController(SimpleMediator mediator)
+        public TicketController(ICommandBus bus)
         {
-            _mediator = mediator;
+            _bus = bus;
         }
 
         // POST /tickets – Create a new ticket (Employee only)
-        [HttpPost]
+        [HttpPost("CreateTicket")]
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Create([FromBody] CreateTicketCommand command)
         {
             command.CreatedByUserId = GetUserId();
-            var ticketId = await _mediator.Send(command);
+            var ticketId = await _bus.Send(command);
             return Ok(new { ticketId });
         }
 
         // GET /tickets/my – List tickets created by the current user (Employee)
-        [HttpGet("my")]
+        [HttpGet("myTickets")]
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> GetMyTickets()
         {
             var query = new GetMyTicketsQuery { UserId = GetUserId() };
-            var tickets = await _mediator.Send(query);
+            var tickets = await _bus.Send(query);
             return Ok(tickets);
         }
 
         // GET /tickets – List all tickets (Admin only)
-        [HttpGet]
+        [HttpGet("GetAllTickets")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllTickets()
         {
-            var tickets = await _mediator.Send(new GetAllTicketsQuery());
+            var tickets = await _bus.Send(new GetAllTicketsQuery());
             return Ok(tickets);
         }
 
@@ -57,7 +57,7 @@ namespace TicketingSystem.Api.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTicketCommand command)
         {
             command.TicketId = id;
-            var result = await _mediator.Send(command);
+            var result = await _bus.Send(command);
             return result ? Ok("Ticket updated") : NotFound("Ticket not found");
         }
 
@@ -66,7 +66,7 @@ namespace TicketingSystem.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetStats()
         {
-            var stats = await _mediator.Send(new GetTicketStatsQuery());
+            var stats = await _bus.Send(new GetTicketStatsQuery());
             return Ok(stats);
         }
 

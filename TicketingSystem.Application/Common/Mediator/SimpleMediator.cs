@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TicketingSystem.Application.Common.Mediator
 {
-    public class SimpleMediator
+    public class SimpleMediator :ICommandBus
     {
         private readonly IServiceProvider _provider;
 

@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 namespace TicketingSystem.Application.Common.Mediator
 {
+     // هر Command باید TResult رو مشخص کنه
     public interface ICommand<TResult> { }
 
-    public interface ICommandHandler<TCommand, TResult> where TCommand : ICommand<TResult>
+    public interface ICommandHandler<TCommand, TResult>
+        where TCommand : ICommand<TResult>
     {
         Task<TResult> Handle(TCommand command, CancellationToken cancellationToken);
     }
+
+    public interface ICommandBus
+    {
+        Task<TResult> Send<TResult>(ICommand<TResult> command, CancellationToken cancellationToken = default);
+    }
+
 
 }
