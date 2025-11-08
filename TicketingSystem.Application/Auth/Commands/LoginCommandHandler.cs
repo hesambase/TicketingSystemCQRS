@@ -24,19 +24,13 @@ namespace TicketingSystem.Application.Auth.Commands
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 
-            //if (user is null || user.PasswordHash != HashPassword(command.Password))
-              //throw new UnauthorizedAccessException("Invalid credentials");
+            if (user is null || !BCrypt.Net.BCrypt.Verify(command.Password, user.PasswordHash))
+              throw new UnauthorizedAccessException("Invalid credentials");
 
             return _tokenService.GenerateToken(user);
         }
 
-        private string HashPassword(string password)
-        {
-            using var sha = System.Security.Cryptography.SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
+    
     }
 
 
